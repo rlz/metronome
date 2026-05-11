@@ -1,98 +1,68 @@
-import { M3eFab } from '@m3e/react/fab'
-import { M3eFormField } from '@m3e/react/form-field'
-import { M3eHeading } from '@m3e/react/heading'
-import { M3eIcon } from '@m3e/react/icon'
-import { M3eOption } from '@m3e/react/option'
-import { M3eSelect } from '@m3e/react/select'
-import { M3eSlider, M3eSliderThumb } from '@m3e/react/slider'
+import { PlayArrow, Stop } from '@mui/icons-material'
+import Box from '@mui/material/Box'
+import Fab from '@mui/material/Fab'
+import FormControl from '@mui/material/FormControl'
+import InputLabel from '@mui/material/InputLabel'
+import MenuItem from '@mui/material/MenuItem'
+import Paper from '@mui/material/Paper'
+import Select from '@mui/material/Select'
+import { useTheme } from '@mui/material/styles'
 import { useProxy } from 'valtio/utils'
 
 import { metronomeDerivedState, metronomeState } from '../utils/metronome.ts'
 import { StepWidget } from './StepWidget.tsx'
+import { TempoWidget } from './TempoWidget.tsx'
 
 export const Metronome = () => {
     const metronome = useProxy(metronomeState)
     const metronomeDerived = useProxy(metronomeDerivedState)
+    const theme = useTheme()
 
     return (
-        <div
-            css={{
-                padding: '1rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1rem'
-            }}
-        >
-            <div css={{ display: 'flex', gap: '16px' }}>
-                <M3eSlider
-                    css={{ display: 'block', flexGrow: '1' }}
-                    style={{ display: 'block' }}
-                    min={40}
-                    max={300}
-                    step={1}
-                >
-                    <M3eSliderThumb
-                        value={metronome.newTempo}
-                        onInput={(e) => {
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            metronome.newTempo = (e.target! as any).value
-                        }}
-                    />
-                </M3eSlider>
-                <div
-                    css={{
-                        textAlign: 'center'
-                    }}
-                >
-                    <M3eHeading variant={'label'} size={'large'}>{'Tempo'}</M3eHeading>
-                    <div>{metronome.newTempo}</div>
-                </div>
-            </div>
-            <M3eFormField>
-                <label slot={'label'}>{'Beats per measure'}</label>
-                <M3eSelect
+        <Paper elevation={3} sx={{ p: 1, gap: 1, display: 'flex', flexDirection: 'column' }}>
+            <TempoWidget />
+
+            <FormControl>
+                <InputLabel id={'bpmeasure'}>{'Beats per measure'}</InputLabel>
+                <Select
+                    labelId={'bpmeasure'}
+                    value={metronome.newBeatsPerMeasure}
+                    label={'Beats per measure'}
                     onChange={(e) => {
-                        // console.log('+', Number.parseInt((e.target! as any).value))
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        metronome.newBeatsPerMeasure = Number.parseInt((e.target! as any).value)
-                        if (!metronome.isPlaying) metronome.currentBeatsPerMeasure = metronome.newBeatsPerMeasure
+                        metronome.newBeatsPerMeasure = e.target.value
+                        if (!metronome.isPlaying) metronome.currentBeatsPerMeasure = e.target.value
                     }}
                 >
-                    <M3eOption value={'2'} selected={metronome.newBeatsPerMeasure === 2}>{'2'}</M3eOption>
-                    <M3eOption value={'3'} selected={metronome.newBeatsPerMeasure === 3}>{'3'}</M3eOption>
-                    <M3eOption value={'4'} selected={metronome.newBeatsPerMeasure === 4}>{'4'}</M3eOption>
-                    <M3eOption value={'5'} selected={metronome.newBeatsPerMeasure === 5}>{'5'}</M3eOption>
-                    <M3eOption value={'6'} selected={metronome.newBeatsPerMeasure === 6}>{'6'}</M3eOption>
-                    <M3eOption value={'7'} selected={metronome.newBeatsPerMeasure === 7}>{'7'}</M3eOption>
-                    <M3eOption value={'8'} selected={metronome.newBeatsPerMeasure === 8}>{'8'}</M3eOption>
-                </M3eSelect>
-            </M3eFormField>
-            <M3eFormField>
-                <label slot={'label'}>{'Subdivision'}</label>
-                <M3eSelect
+                    <MenuItem value={2}>{'2'}</MenuItem>
+                    <MenuItem value={3}>{'3'}</MenuItem>
+                    <MenuItem value={4}>{'4'}</MenuItem>
+                    <MenuItem value={5}>{'5'}</MenuItem>
+                    <MenuItem value={6}>{'6'}</MenuItem>
+                    <MenuItem value={7}>{'7'}</MenuItem>
+                    <MenuItem value={8}>{'8'}</MenuItem>
+                </Select>
+            </FormControl>
+            <FormControl>
+                <InputLabel id={'subdivision'}>{'Subdivision'}</InputLabel>
+                <Select
+                    labelId={'subdivision'}
+                    value={metronome.newSubdivision}
+                    label={'Subdivision'}
                     onChange={(e) => {
-                        // console.log(Number.parseInt((e.target! as any).value))
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        metronome.newSubdivision = Number.parseInt((e.target! as any).value)
-                        if (!metronome.isPlaying) metronome.currentSubdivision = metronome.newSubdivision
+                        metronome.newSubdivision = e.target.value
+                        if (!metronome.isPlaying) metronome.currentSubdivision = e.target.value
                     }}
                 >
-                    <M3eOption value={'1'} selected={metronome.newSubdivision === 1}>{'1'}</M3eOption>
-                    <M3eOption value={'2'} selected={metronome.newSubdivision === 2}>{'2'}</M3eOption>
-                    <M3eOption value={'3'} selected={metronome.newSubdivision === 3}>{'3'}</M3eOption>
-                    <M3eOption value={'4'} selected={metronome.newSubdivision === 4}>{'4'}</M3eOption>
-                </M3eSelect>
-            </M3eFormField>
-            <div
-                css={{
-                    display: 'flex',
-                    gap: '0.5rem',
-                    flexWrap: 'wrap',
-                    justifyContent: 'center'
-                }}
-            >
-                {Array(metronome.currentBeatsPerMeasure).fill(null).map((_, i) => (
-                    <div css={{ width: '5rem', height: '5rem' }}>
+                    <MenuItem value={1}>{'1'}</MenuItem>
+                    <MenuItem value={2}>{'2'}</MenuItem>
+                    <MenuItem value={3}>{'3'}</MenuItem>
+                    <MenuItem value={4}>{'4'}</MenuItem>
+                </Select>
+            </FormControl>
+
+            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+                {Array(Math.min(metronome.currentBeatsPerMeasure, 4)).fill(null).map((_, i) => (
+                    <Box sx={{ flex: '0 1 6rem', maxWidth: '6rem' }}>
                         <StepWidget
                             key={i}
                             substep={
@@ -101,16 +71,35 @@ export const Metronome = () => {
                             substepsCount={metronome.currentSubdivision}
                             step={i}
                         />
-                    </div>
+                    </Box>
                 ))}
-            </div>
-            <M3eFab
-                css={{ position: 'absolute', bottom: '1rem', right: '1rem' }}
-                variant={'primary'}
+            </Box>
+            {
+                metronome.currentBeatsPerMeasure > 4
+                && (
+                    <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+                        {Array(Math.min(metronome.currentBeatsPerMeasure - 4, 4)).fill(null).map((_, i) => (
+                            <Box sx={{ flex: '0 1 6rem', maxWidth: '6rem' }}>
+                                <StepWidget
+                                    key={i}
+                                    substep={
+                                        metronome.isPlaying ? metronomeDerived.prevSubbeat : -1
+                                    }
+                                    substepsCount={metronome.currentSubdivision}
+                                    step={i + 4}
+                                />
+                            </Box>
+                        ))}
+                    </Box>
+                )
+            }
+
+            <Fab
+                sx={{ position: 'absolute', bottom: theme.spacing(1), right: theme.spacing(1) }}
                 onClick={() => metronome.isPlaying = !metronome.isPlaying}
             >
-                <M3eIcon name={metronome.isPlaying ? 'stop' : 'play_arrow'} />
-            </M3eFab>
-        </div>
+                {metronome.isPlaying ? <Stop /> : <PlayArrow /> }
+            </Fab>
+        </Paper>
     )
 }

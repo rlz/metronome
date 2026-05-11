@@ -4,10 +4,10 @@ import { defineConfig } from 'vite'
 export default defineConfig({
     plugins: [
         react({
-            jsxImportSource: '@emotion/react', // Важно для css prop
-            babel: {
-                plugins: ['@emotion/babel-plugin']
-            }
+            // jsxImportSource: '@emotion/react', // Важно для css prop
+            // babel: {
+            //     plugins: ['@emotion/babel-plugin']
+            // }
         })
     ]
 })

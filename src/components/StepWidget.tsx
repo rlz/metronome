@@ -1,4 +1,4 @@
-import { DesignToken } from '@m3e/web/core'
+import { useTheme } from '@mui/material'
 
 interface Props {
     substepsCount: number
@@ -7,6 +7,8 @@ interface Props {
 }
 
 export function StepWidget({ step: step, substep: substep, substepsCount: substepsCount }: Props) {
+    const theme = useTheme()
+
     const gap = 24
     const r1 = 80
     const r2 = 100
@@ -16,7 +18,7 @@ export function StepWidget({ step: step, substep: substep, substepsCount: subste
     const cos = (deg: number) => Math.cos(Math.PI * (90 - deg) / 180)
 
     return (
-        <svg viewBox={'-100 -100 200 200'}>
+        <svg viewBox={'-100 -100 200 200'} css={{ display: 'block' }}>
             {
                 substepsCount === 1
                     ? [
@@ -25,7 +27,7 @@ export function StepWidget({ step: step, substep: substep, substepsCount: subste
                                 <circle fill={'black'} r={r1} />
                             </mask>,
                             <circle
-                                fill={step * substepsCount <= substep ? DesignToken.color.primaryContainer.cssText : DesignToken.color.surfaceContainer.cssText}
+                                fill={step * substepsCount <= substep ? theme.palette.primary.main : theme.palette.secondary.light}
                                 r={r2}
                                 mask={'url(#xxx)'}
                             />
@@ -35,7 +37,7 @@ export function StepWidget({ step: step, substep: substep, substepsCount: subste
                             const a2 = 360 * (i + 1) / substepsCount - gap / 2
                             return (
                                 <path
-                                    fill={step * substepsCount + i <= substep ? DesignToken.color.primaryContainer.cssText : DesignToken.color.surfaceContainer.cssText}
+                                    fill={step * substepsCount + i <= substep ? theme.palette.primary.main : theme.palette.secondary.light}
                                     d={[
                                         `M ${r2 * cos(a1)} ${r2 * sin(a1)}`,
                                         `A ${r3} ${r3} 0 0 0 ${r1 * cos(a1)} ${r1 * sin(a1)}`,
@@ -49,7 +51,7 @@ export function StepWidget({ step: step, substep: substep, substepsCount: subste
             }
             <text
                 fontSize={r2}
-                fill={DesignToken.color.onSurface.cssText}
+                fill={theme.palette.text.secondary}
                 alignmentBaseline={'central'}
                 textAnchor={'middle'}
             >
