@@ -1,26 +1,36 @@
-const volume = 0.5
-const accentVolume = 0.9
-const frequency = 800
-const accentFrequency = 1200
+const beatTypes = {
+    accent: {
+        volume: 1,
+        frequency: 1100
+    },
+    normal: {
+        volume: 0.6,
+        frequency: 800
+    },
+    sub: {
+        volume: 0.6,
+        frequency: 500
+    }
+}
+
+export type BeatTypes = keyof typeof beatTypes
 
 const audioContext = new window.AudioContext()
 
-function createOscillatorAndGain(frequency: number, volume: number): [OscillatorNode, GainNode] {
+function createOscillatorAndGain(type: BeatTypes): [OscillatorNode, GainNode] {
     const oscillator = audioContext.createOscillator()
     const gain = audioContext.createGain()
 
     oscillator.connect(gain)
     gain.connect(audioContext.destination)
 
-    oscillator.frequency.value = frequency
-    gain.gain.value = volume
+    oscillator.frequency.value = beatTypes[type].frequency
+    gain.gain.value = beatTypes[type].volume
     return [oscillator, gain]
 }
 
-export function playBeat(isAccent: boolean): void {
-    const [o, g] = isAccent
-        ? createOscillatorAndGain(accentFrequency, accentVolume)
-        : createOscillatorAndGain(frequency, volume)
+export function playBeat(type: BeatTypes): void {
+    const [o, g] = createOscillatorAndGain(type)
 
     o.start(audioContext.currentTime)
     g.gain.exponentialRampToValueAtTime(

@@ -12,11 +12,18 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
+        "@emotion/react": "^11.14.0",
+        "@emotion/styled": "^11.14.1",
         "@m3e/react": "^2.5.2",
+        "@m3e/web": "^2.5.2",
         "react": "^18.2.0",
-        "react-dom": "^18.2.0"
+        "react-dom": "^18.2.0",
+        "valtio": "^2.3.2",
+        "valtio-persist": "^2.2.4",
+        "valtio-reactive": "^0.2.0"
     },
     "devDependencies": {
+        "@emotion/babel-plugin": "^11.13.5",
         "@stylistic/eslint-plugin": "^5.6.1",
         "@types/react": "^18.2.43",
         "@types/react-dom": "^18.2.17",
