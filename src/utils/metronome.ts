@@ -7,6 +7,7 @@ export const { store: metronomeState } = await persist({
     isPlaying: false,
     currentTempo: 90,
     newTempo: 90,
+    autoTempo: false,
     currentBeatsPerMeasure: 4,
     newBeatsPerMeasure: 4,
     currentSubdivision: 1,
