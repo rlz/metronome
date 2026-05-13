@@ -10,6 +10,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 
 import { Metronome } from './components/Metronome.tsx'
+import { initMetronome } from './utils/metronome.ts'
 
 function App() {
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
@@ -37,8 +38,13 @@ function App() {
     )
 }
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-    <React.StrictMode>
-        <App />
-    </React.StrictMode>
-)
+async function initApp() {
+    await initMetronome()
+    ReactDOM.createRoot(document.getElementById('root')!).render(
+        <React.StrictMode>
+            <App />
+        </React.StrictMode>
+    )
+}
+
+initApp().catch(e => console.error('init', e))

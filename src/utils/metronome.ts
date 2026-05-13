@@ -3,7 +3,7 @@ import { computed, effect } from 'valtio-reactive'
 
 import { BeatTypes, playBeat } from './audio.ts'
 
-export const { store: metronomeState } = await persist({
+const initialMetronomeState = {
     isPlaying: false,
     currentTempo: 90,
     newTempo: 90,
@@ -13,72 +13,99 @@ export const { store: metronomeState } = await persist({
     currentSubdivision: 1,
     newSubdivision: 1,
     nextSubbeat: -1
-}, 'metronomeState')
-
-export const metronomeDerivedState = computed({
-    prevSubbeat: () => (
-        metronomeState.nextSubbeat > 0
-            ? metronomeState.nextSubbeat
-            : metronomeState.currentBeatsPerMeasure * metronomeState.currentSubdivision
-    ) - 1,
-    prevBeat: () => Math.floor(
-        (
-            (
-                metronomeState.nextSubbeat > 0
-                    ? metronomeState.nextSubbeat
-                    : metronomeState.currentBeatsPerMeasure * metronomeState.currentSubdivision
-            ) - 1
-        ) / metronomeState.currentSubdivision
-    ),
-    nextBeatType: (): BeatTypes => metronomeState.nextSubbeat === 0
-        ? 'accent'
-        : (
-                metronomeState.nextSubbeat % metronomeState.currentSubdivision === 0
-                    ? 'normal'
-                    : 'sub'
-            ),
-    currentTimeout: () => 60000 / (metronomeState.currentTempo * metronomeState.currentSubdivision),
-    newTimeout: () => 60000 / (metronomeState.newTempo * metronomeState.newSubdivision)
-})
-
-let interval: number | null = null
-
-const intervalCallback = () => {
-    playBeat(metronomeDerivedState.nextBeatType)
-
-    const subbeatsCount = metronomeState.currentBeatsPerMeasure * metronomeState.currentSubdivision
-    metronomeState.nextSubbeat = (metronomeState.nextSubbeat + 1) % subbeatsCount
-
-    // console.log('!', metronomeDerivedState.prevSubbeat)
-
-    if (
-        metronomeState.nextSubbeat === 1 && (
-            metronomeState.newTempo !== metronomeState.currentTempo
-            || metronomeState.newBeatsPerMeasure !== metronomeState.currentBeatsPerMeasure
-            || metronomeState.newSubdivision !== metronomeState.currentSubdivision
-        )
-    ) {
-        clearInterval(interval!)
-        interval = setInterval(intervalCallback, metronomeDerivedState.newTimeout)
-        metronomeState.currentTempo = metronomeState.newTempo
-        metronomeState.currentBeatsPerMeasure = metronomeState.newBeatsPerMeasure
-        metronomeState.currentSubdivision = metronomeState.newSubdivision
-    }
 }
 
-effect(() => {
-    if (metronomeState.isPlaying) {
-        if (interval !== null) return
+type MetronomeStateType = typeof initialMetronomeState
 
-        interval = setInterval(intervalCallback, metronomeDerivedState.newTimeout)
-        metronomeState.currentTempo = metronomeState.newTempo
-        metronomeState.currentBeatsPerMeasure = metronomeState.newBeatsPerMeasure
-        metronomeState.currentSubdivision = metronomeState.newSubdivision
-        metronomeState.nextSubbeat = 0
-        intervalCallback()
-    } else if (interval !== null) {
-        clearInterval(interval)
-        interval = null
-        metronomeState.nextSubbeat = -1
+let metronomeState: MetronomeStateType | null = null
+let metronomeDerivedState: {
+    prevSubbeat: number
+    prevBeat: number
+    nextBeatType: BeatTypes
+    currentTimeout: number
+    newTimeout: number
+} | null = null
+
+export function getMetronomeState() {
+    if (metronomeState === null) throw Error('init metronome')
+    return metronomeState
+}
+
+export function getMetronomeDerivedState() {
+    if (metronomeDerivedState === null) throw Error('init metronome')
+    return metronomeDerivedState
+}
+
+export async function initMetronome() {
+    const { store: m } = await persist(initialMetronomeState, 'metronomeState')
+    metronomeState = m
+
+    const md = computed({
+        prevSubbeat: () => (
+            m.nextSubbeat > 0
+                ? m.nextSubbeat
+                : m.currentBeatsPerMeasure * m.currentSubdivision
+        ) - 1,
+        prevBeat: () => Math.floor(
+            (
+                (
+                    m.nextSubbeat > 0
+                        ? m.nextSubbeat
+                        : m.currentBeatsPerMeasure * m.currentSubdivision
+                ) - 1
+            ) / m.currentSubdivision
+        ),
+        nextBeatType: (): BeatTypes => m.nextSubbeat === 0
+            ? 'accent'
+            : (
+                    m.nextSubbeat % m.currentSubdivision === 0
+                        ? 'normal'
+                        : 'sub'
+                ),
+        currentTimeout: () => 60000 / (m.currentTempo * m.currentSubdivision),
+        newTimeout: () => 60000 / (m.newTempo * m.newSubdivision)
+    })
+    metronomeDerivedState = md
+
+    let interval: number | null = null
+
+    const intervalCallback = () => {
+        playBeat(md.nextBeatType)
+
+        const subbeatsCount = m.currentBeatsPerMeasure * m.currentSubdivision
+        m.nextSubbeat = (m.nextSubbeat + 1) % subbeatsCount
+
+        // console.log('!', metronomeDerivedState.prevSubbeat)
+
+        if (
+            m.nextSubbeat === 1 && (
+                m.newTempo !== m.currentTempo
+                || m.newBeatsPerMeasure !== m.currentBeatsPerMeasure
+                || m.newSubdivision !== m.currentSubdivision
+            )
+        ) {
+            clearInterval(interval!)
+            interval = setInterval(intervalCallback, md.newTimeout)
+            m.currentTempo = m.newTempo
+            m.currentBeatsPerMeasure = m.newBeatsPerMeasure
+            m.currentSubdivision = m.newSubdivision
+        }
     }
-})
+
+    effect(() => {
+        if (m.isPlaying) {
+            if (interval !== null) return
+
+            interval = setInterval(intervalCallback, md.newTimeout)
+            m.currentTempo = m.newTempo
+            m.currentBeatsPerMeasure = m.newBeatsPerMeasure
+            m.currentSubdivision = m.newSubdivision
+            m.nextSubbeat = 0
+            intervalCallback()
+        } else if (interval !== null) {
+            clearInterval(interval)
+            interval = null
+            m.nextSubbeat = -1
+        }
+    })
+}

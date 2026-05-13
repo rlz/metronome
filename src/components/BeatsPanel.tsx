@@ -8,11 +8,11 @@ import { useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import { useProxy } from 'valtio/utils'
 
-import { metronomeDerivedState, metronomeState } from '../utils/metronome'
-import { StepWidget } from './StepWidget'
+import { getMetronomeDerivedState, getMetronomeState } from '../utils/metronome.ts'
+import { StepWidget } from './StepWidget.tsx'
 
 function SetSdvButton({ subdivision }: { subdivision: number }) {
-    const m = useProxy(metronomeState)
+    const m = useProxy(getMetronomeState())
 
     return (
         <Button
@@ -28,8 +28,8 @@ function SetSdvButton({ subdivision }: { subdivision: number }) {
 }
 
 export function BeatsPanel() {
-    const m = useProxy(metronomeState)
-    const md = useProxy(metronomeDerivedState)
+    const m = useProxy(getMetronomeState())
+    const md = useProxy(getMetronomeDerivedState())
     const theme = useTheme()
     const small = useMediaQuery(theme.breakpoints.down('md'))
 

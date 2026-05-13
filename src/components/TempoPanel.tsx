@@ -10,11 +10,11 @@ import Tabs from '@mui/material/Tabs'
 import Typography from '@mui/material/Typography'
 import { useProxy } from 'valtio/utils'
 
-import { metronomeState } from '../utils/metronome'
-import { ConstTempo } from './ConstTempo'
+import { getMetronomeState } from '../utils/metronome.ts'
+import { ConstTempo } from './ConstTempo.tsx'
 
 export function TempoPanel() {
-    const metronome = useProxy(metronomeState)
+    const metronome = useProxy(getMetronomeState())
     const theme = useTheme()
     const small = useMediaQuery(theme.breakpoints.down('md'))
 

@@ -9,10 +9,10 @@ import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { useProxy } from 'valtio/utils'
 
-import { metronomeState } from '../utils/metronome'
+import { getMetronomeState } from '../utils/metronome.ts'
 
 export function ConstTempo({ sx }: { sx: SxProps }) {
-    const m = useProxy(metronomeState)
+    const m = useProxy(getMetronomeState())
     const theme = useTheme()
     const small = useMediaQuery(theme.breakpoints.down('md'))
 
