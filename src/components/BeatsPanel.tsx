@@ -62,6 +62,7 @@ export function BeatsPanel() {
                     Array(8).fill(null).map((_, i) => {
                         return (
                             <button
+                                key={i}
                                 css={
                                     {
                                         'padding': 0,
@@ -92,7 +93,6 @@ export function BeatsPanel() {
                                 }}
                             >
                                 <StepWidget
-                                    key={i}
                                     currentSubstep={
                                         m.isPlaying ? md.prevSubbeat : -1
                                     }

@@ -48,6 +48,7 @@ export function StepWidget({ step, currentSubstep, substepsCount, disabled }: Pr
                             const a2 = 360 * (i + 1) / substepsCount - gap / 2
                             return (
                                 <path
+                                    key={i}
                                     fill={getColor(i)}
                                     d={[
                                         `M ${r2 * cos(a1)} ${r2 * sin(a1)}`,
