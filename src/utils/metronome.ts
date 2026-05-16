@@ -7,12 +7,18 @@ const initialMetronomeState = {
     isPlaying: false,
     currentTempo: 90,
     newTempo: 90,
-    autoTempo: false,
     currentBeatsPerMeasure: 4,
     newBeatsPerMeasure: 4,
     currentSubdivision: 1,
     newSubdivision: 1,
-    nextSubbeat: -1
+    nextSubbeat: -1,
+
+    autoTempo: false,
+    startTempo: 90,
+    step: 5,
+    stepAfter: 2,
+    progress: 0,
+    stepsCount: 10
 }
 
 type MetronomeStateType = typeof initialMetronomeState
@@ -76,6 +82,13 @@ export async function initMetronome() {
         m.nextSubbeat = (m.nextSubbeat + 1) % subbeatsCount
 
         // console.log('!', metronomeDerivedState.prevSubbeat)
+
+        if (m.nextSubbeat === 0 && m.autoTempo && m.progress < m.stepsCount * m.stepAfter) {
+            m.progress++
+            if (m.progress % m.stepAfter === 0) {
+                m.newTempo += m.step
+            }
+        }
 
         if (
             m.nextSubbeat === 1 && (
